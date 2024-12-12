@@ -1,0 +1,6 @@
+# Executável do projeto
+build/petshop_app
+# Arquivos de sistema
+.DS_Store
+# Configurações locais de IDEs
+.vscode/
