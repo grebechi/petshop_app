@@ -25,14 +25,52 @@ O sistema possui as seguintes funcionalidades:
 
 ## Estrutura do Projeto
 
-O projeto segue uma organização modular, com separação de responsabilidades em arquivos .c e .h:
+O projeto segue uma organização modular, com separação de responsabilidades em arquivos `.c` e `.h`, organizados em pastas:
 
-- **main.c**: Ponto de entrada do programa. Gerencia o menu principal e chama as funções das outras módulos.
-- **Cliente.c / Cliente.h**: Funções para gerenciar clientes.
-- **Pet.c / Pet.h**: Funções para gerenciar pets.
-- **Servico.c / Servico.h**: Funções para gerenciar serviços.
-- **Prestados.c / Prestados.h**: Funções para gerenciar serviços prestados.
-- **Utils.c / Utils.h**: Funções utilitárias compartilhadas entre os módulos.
+- **`src/`**: Contém os arquivos de implementação (`.c`).
+  - **`main.c`**: Ponto de entrada do programa. Gerencia o menu principal e chama as funções dos outros módulos.
+  - **`Cliente.c`**: Funções para gerenciar clientes.
+  - **`Pet.c`**: Funções para gerenciar pets.
+  - **`Servico.c`**: Funções para gerenciar serviços.
+  - **`Prestados.c`**: Funções para gerenciar serviços prestados.
+  - **`Utils.c`**: Funções utilitárias compartilhadas entre os módulos.
+
+- **`include/`**: Contém os arquivos de cabeçalho (`.h`).
+  - **`Cliente.h`**: Declarações para funções relacionadas aos clientes.
+  - **`Pet.h`**: Declarações para funções relacionadas aos pets.
+  - **`Servico.h`**: Declarações para funções relacionadas aos serviços.
+  - **`Prestados.h`**: Declarações para funções relacionadas aos serviços prestados.
+  - **`Utils.h`**: Declarações para funções utilitárias.
+
+- **`src/bin/`**: Contém os arquivos binários (`.bin`).
+  - **`clientes.bin`**: Arquivo binário usado para persistência de dados relacionados a clientes.
+  - **`pets.bin`**: Arquivo binário usado para persistência de dados relacionados a pets.
+  - Outros arquivos binários podem ser adicionados para diferentes entidades, como prestados e serviços.
+
+### Exemplo de Organização do Projeto
+
+petshop_app/
+├── src/
+│   ├── bin/
+│   │   ├── clientes.bin
+│   │   ├── pets.bin
+│   │   ├── servicos.bin
+│   │   └── prestados.bin
+│   ├── main.c
+│   ├── Cliente.c
+│   ├── Pet.c
+│   ├── Servico.c
+│   ├── Prestados.c
+│   └── Utils.c
+├── include/
+│   ├── Cliente.h
+│   ├── Pet.h
+│   ├── Servico.h
+│   ├── Prestados.h
+│   └── Utils.h
+├── petshop_app (executável gerado após compilação)
+└── README.md
+
 
 ## Tecnologias e Ferramentas
 
@@ -52,7 +90,7 @@ O projeto segue uma organização modular, com separação de responsabilidades 
 2. Compile o projeto:
 
    ```bash
-   gcc *.c -o petshop_app
+   gcc src/*.c -Iinclude -o petshop_app
 
 3. Execute o programa:
 
