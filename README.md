@@ -49,27 +49,28 @@ O projeto segue uma organização modular, com separação de responsabilidades 
 
 ### Exemplo de Organização do Projeto
 
-petshop_app/
-├── src/
-│   ├── bin/
-│   │   ├── clientes.bin
-│   │   ├── pets.bin
-│   │   ├── servicos.bin
-│   │   └── prestados.bin
-│   ├── main.c
-│   ├── Cliente.c
-│   ├── Pet.c
-│   ├── Servico.c
-│   ├── Prestados.c
-│   └── Utils.c
-├── include/
-│   ├── Cliente.h
-│   ├── Pet.h
-│   ├── Servico.h
-│   ├── Prestados.h
-│   └── Utils.h
-├── petshop_app (executável gerado após compilação)
-└── README.md
+  ```bash
+      petshop_app/
+      ├── src/
+      │   ├── bin/
+      │   │   ├── clientes.bin
+      │   │   ├── pets.bin
+      │   │   ├── servicos.bin
+      │   │   └── prestados.bin
+      │   ├── main.c
+      │   ├── Cliente.c
+      │   ├── Pet.c
+      │   ├── Servico.c
+      │   ├── Prestados.c
+      │   └── Utils.c
+      ├── include/
+      │   ├── Cliente.h
+      │   ├── Pet.h
+      │   ├── Servico.h
+      │   ├── Prestados.h
+      │   └── Utils.h
+      ├── petshop_app (executável gerado após compilação)
+      └── README.md
 
 
 ## Tecnologias e Ferramentas
