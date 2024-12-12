@@ -95,16 +95,30 @@ void menuCliente() {
             case 1: {
                 Cliente cliente;
                 // Captura o Nome
-                capturarString("Digite o Nome: ", cliente.nome, CLIENTE_MAX_NOME);  
+                capturarString("\nDigite o Nome: ", cliente.nome, CLIENTE_MAX_NOME);  
                 // Captura o telefone
-                capturarString("Digite o Telefone: ", cliente.telefone, CLIENTE_MAX_TELEFONE);
+                capturarString("\nDigite o Telefone: ", cliente.telefone, CLIENTE_MAX_TELEFONE);
                 // Captura o CPF
-                capturarString("Digite o CPF: ", cliente.cpf, CLIENTE_MAX_CPF);
+                capturarString("\nDigite o CPF: ", cliente.cpf, CLIENTE_MAX_CPF);
                 // Gerar o ID do cliente
                 cliente.id = gerarProximoID();
-                salvarCliente(cliente);
-                printf("Cliente cadastrado com sucesso! ID: %d\n", cliente.id);
-                pausarTerminal();
+                switch (salvarCliente(cliente)){
+                    case 1:{
+                        printf("\nCliente cadastrado com sucesso! ID: %d\n", cliente.id);
+                        pausarTerminal();
+                        break;
+                        }
+                    case 0:{
+                        perror("\nErro ao abrir o arquivo original da base de dados");
+                        pausarTerminal();
+                        break;
+                        }
+                    default:{
+                        perror("\nErro ao tentar cadastrar o cliente");
+                        pausarTerminal();
+                        break;
+                        }
+                }
                 break;
             }
             case 2: {

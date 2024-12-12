@@ -24,15 +24,16 @@ int gerarProximoID() {
     return maxID + 1; // Retorna o próximo ID
 }
 
-void salvarCliente(Cliente cliente) {
+int salvarCliente(Cliente cliente) {
     FILE *file = fopen(ARQUIVO_CLIENTE, "ab"); // Abre o arquivo no modo de adicionar binário
     if (file == NULL) {
         perror("Erro ao abrir o arquivo");
-        return;
+        return 0;
     }
 
     fwrite(&cliente, sizeof(Cliente), 1, file); // Escreve o cliente no arquivo
     fclose(file);
+    return 1;
 }
 
 int contarClientes() {
@@ -95,9 +96,9 @@ int atualizarCliente(Cliente *clienteRecebido) {
     while (fread(&cliente, sizeof(Cliente), 1, file)) {
         if (cliente.id == clienteRecebido->id) {
             encontrado = 1; // Encontrou o cliente a ser excluído
-            fwrite(clienteRecebido, sizeof(Cliente), 1, temp); // Escreve no arquivo temporário
+            fwrite(clienteRecebido, sizeof(Cliente), 1, temp); // Escreve o cliente recebido no arquivo temporário
         } else {
-            fwrite(&cliente, sizeof(Cliente), 1, temp); // Escreve no arquivo temporário
+            fwrite(&cliente, sizeof(Cliente), 1, temp); // Escreve os demais clientes no arquivo temporário
         }
     }
 

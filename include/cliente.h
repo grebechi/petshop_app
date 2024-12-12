@@ -16,7 +16,7 @@ typedef struct {
 
 // Declaração das funções
 int gerarProximoID();
-void salvarCliente(Cliente cliente);
+int salvarCliente(Cliente cliente);
 int contarClientes();
 Cliente *listarClientes(int quantidade);
 int atualizarCliente(Cliente *clienteRecebido);
