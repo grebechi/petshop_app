@@ -70,6 +70,7 @@ O projeto segue uma organização modular, com separação de responsabilidades 
   │   ├── Prestados.h
   │   └── Utils.h
   ├── petshop_app (executável gerado após compilação)
+  ├── .gitignore (usado no Git para especificar quais arquivos ou pastas devem ser ignorados pelo controle de versão)
   └── README.md
 ```
 
@@ -86,17 +87,20 @@ O projeto segue uma organização modular, com separação de responsabilidades 
    ```bash
    git clone https://github.com/grebechi/petshop_app
    cd petshop_app
+   ```
 
 
 2. Compile o projeto:
 
    ```bash
-   gcc src/*.c -Iinclude -o petshop_app
+   gcc src/*.c -Iinclude -o build/petshop_app
+   ```
 
 3. Execute o programa:
 
     ```bash
-    ./petshop_app
+    build/petshop_app
+    ```
 
 ## Instruções de Uso
 
@@ -117,4 +121,4 @@ Este projeto foi uma oportunidade de explorar conceitos de:
 ## Licença
 Este projeto está licenciado sob a Licença MIT.
 
-Desenvolvido por Gabriel Rebechi e Benício Reinehr Dal Forno do curso de Tecnologia em Análise e Desenvolvimento de Sistemas.
+Desenvolvido por [Gabriel Rebechi](https://github.com/grebechi) e colaboração de [Benício Reinehr Dal Forno](https://github.com/benicioforno) do curso de Tecnologia em Análise e Desenvolvimento de Sistemas.
