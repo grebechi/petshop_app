@@ -4,6 +4,7 @@
 #include "../include/cliente.h"
 #include "../include/utils.h"
 
+//Cabeçalho das funções utilizadas na main
 void capturarString(const char *mensagem, char *destino, int tamanho);
 void menuPrincipal();
 void menuCliente();
@@ -48,27 +49,34 @@ void menuPrincipal(){
         fflush(stdin);
 
         switch (opcao) {
-            case 1: 
+            case 1:{ //Menu Cliente
                 menuCliente();
                 break;
-            case 2:
+            }
+            case 2:{ //Menu Pets
                 printf("\n[MENU PETS] Ainda não foi implementado!\n");
                 pausarTerminal();
                 break;
-            case 3:
+            }
+            case 3:{ //Menu Serviços
                 printf("\n[MENU SERVIÇOS] Ainda não foi implementado!\n");
                 pausarTerminal();
                 break;
-            case 4:
+            }
+            case 4:{ //Menu Serviços Prestados
                 printf("\n[MENU SERVIÇOS PRESTADOS] Ainda não foi implementado!\n");
                 pausarTerminal();
                 break;
-            case 0:
+            }
+            case 0:{ //Sair do Sistema
                 printf("\nSaindo do Sistema...\n");
                 break;
-            default:
+            }
+            default:{ //Opção Inválida
                 printf("\nOpção inválida! Tente novamente.\n");
                 pausarTerminal();
+                break;
+            }
         }
     } while (opcao != 0);
 
@@ -95,7 +103,7 @@ void menuCliente() {
         fflush(stdin);
 
         switch (opcao) {
-            case 1: {
+            case 1:{ //Cadastrar Cliente
                 Cliente cliente;
                 limparTerminal();
                 printf("\n=== Cadastrar Novo Cliente ===\n");
@@ -126,7 +134,7 @@ void menuCliente() {
                 }
                 break;
             }
-            case 2: {
+            case 2:{ //Listar Clientes
                 int quantidade = contarClientes();
                 if (quantidade > 0) {
                 // Chama a função listarClientes
@@ -151,7 +159,7 @@ void menuCliente() {
                     }
                 break;
             }
-            case 3:{
+            case 3:{ //Atualizar Cliente
                 int id;
                 limparTerminal();
                 printf("\n=== Atualizar Cliente ===\n\n");
@@ -201,7 +209,7 @@ void menuCliente() {
                 free(clienteParaEnviar);
                 break;
             }
-            case 4: {
+            case 4:{ //Excluir Cliente
                 int id;
                 limparTerminal();
                 printf("\n=== Excluir Cliente ===\n\n");
@@ -259,7 +267,7 @@ void menuCliente() {
                 free(cliente);
                 break;
             }
-            case 5:
+            case 5:{ //Clientes Padrão
                 if(quantidadeClientes == 0){
                     if(adicionarClientesPadrao() == 1){
                         printf("\nClientes padrão adicionados ao sistema.\n");
@@ -274,13 +282,17 @@ void menuCliente() {
                 }
                 
                 break;
-            case 0:
+                }
+            case 0:{ //Voltar para o Menu Principal
                 printf("\nVoltando para o Menu Principal...\n");
                 pausarTerminal();
                 break;
-            default:
+            }
+            default:{ //Opção Inválida
                 printf("Opção inválida! Tente novamente.\n");
                 pausarTerminal();
+            break;
+            }
         }
     } while (opcao != 0);
     
