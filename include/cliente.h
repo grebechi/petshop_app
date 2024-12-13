@@ -23,6 +23,6 @@ int atualizarCliente(Cliente *clienteRecebido);
 int excluirCliente(int id);
 Cliente *buscarClientePeloID(int id);
 int clienteJaExiste(const char *nome);
-void adicionarClientesPadrao();
+int adicionarClientesPadrao();
 
 #endif

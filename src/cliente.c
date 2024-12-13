@@ -27,7 +27,6 @@ int gerarProximoID() {
 int salvarCliente(Cliente cliente) {
     FILE *file = fopen(ARQUIVO_CLIENTE, "ab"); // Abre o arquivo no modo de adicionar binário
     if (file == NULL) {
-        perror("Erro ao abrir o arquivo");
         return 0;
     }
 
@@ -56,7 +55,6 @@ int contarClientes() {
 Cliente *listarClientes(int quantidade) {
     FILE *file = fopen(ARQUIVO_CLIENTE, "rb");
     if (file == NULL) {
-        perror("Erro ao abrir o arquivo");
         return NULL;
     }
 
@@ -67,7 +65,6 @@ Cliente *listarClientes(int quantidade) {
 
     Cliente *clientes = (Cliente *)malloc(quantidade * sizeof(Cliente));
     if (clientes == NULL) {
-        perror("Erro ao alocar memória");
         fclose(file);
         return NULL;
     }
@@ -188,7 +185,7 @@ int clienteJaExiste(const char *nome) {
     return 0; // Cliente não encontrado
 }
 
-void adicionarClientesPadrao() {
+int adicionarClientesPadrao() {
     // Lista de clientes padrão
     Cliente clientesPadrao[] = {
         {0, "Alice", "123456789", "123.456.789-00"},
@@ -206,7 +203,10 @@ void adicionarClientesPadrao() {
     for (int i = 0; i < 10; i++) {
         if (!clienteJaExiste(clientesPadrao[i].nome)) {
             clientesPadrao[i].id = gerarProximoID();
-            salvarCliente(clientesPadrao[i]);
+            if(salvarCliente(clientesPadrao[i]) == 0){
+                return 0;
+            }
         }
     }
+    return 1;
 }

@@ -76,15 +76,18 @@ void menuPrincipal(){
 
 //função para acessar o menu do cliente
 void menuCliente() {
-    int opcao;
+    int opcao, quantidadeClientes;
     do {
+        quantidadeClientes = contarClientes();
         limparTerminal();
-        printf("\n=== Menu Cliente ===\n");
+        printf("\n=== Menu Cliente [%d no total] ===\n",quantidadeClientes);
         printf("1 - Cadastrar Cliente\n");
         printf("2 - Listar Clientes\n");
         printf("3 - Atualizar Cliente\n");
         printf("4 - Excluir Cliente\n");
-        printf("5 - Adicionar Clientes Padrão\n");
+        if(quantidadeClientes == 0){
+            printf("5 - Adicionar Clientes Padrão\n");
+        }
         printf("0 - Voltar ao Menu Principal\n");
         printf("======================\n");
         printf("Escolha uma opção: ");
@@ -94,6 +97,8 @@ void menuCliente() {
         switch (opcao) {
             case 1: {
                 Cliente cliente;
+                limparTerminal();
+                printf("\n=== Cadastrar Novo Cliente ===\n");
                 // Captura o Nome
                 capturarString("\nDigite o Nome: ", cliente.nome, CLIENTE_MAX_NOME);  
                 // Captura o telefone
@@ -123,27 +128,27 @@ void menuCliente() {
             }
             case 2: {
                 int quantidade = contarClientes();
+                if (quantidade > 0) {
                 // Chama a função listarClientes
                 Cliente *clientes = listarClientes(quantidade);
                 if(clientes){
-                    if (quantidade > 0) {
                         limparTerminal();
-                        printf("\n=== Lista de Clientes ===\n\n");
+                        printf("\n=== Lista de Clientes [%d no total]===\n\n",quantidadeClientes);
                         for (int i = 0; i < quantidade; i++) {
                             printf("ID: %d, Nome: %s, Telefone: %s, CPF: %s\n",
                                 clientes[i].id, clientes[i].nome,
                                 clientes[i].telefone, clientes[i].cpf);
                         }
                         pausarTerminal();
-                    } else {
-                        printf("Nenhum cliente encontrado.\n");
-                        pausarTerminal();
-                    }
                 }else{
-                    printf("Não foi possível ler o Banco de Dados.\n");
+                    perror("\nErro ao abrir o banco de dados");
                     pausarTerminal();
                 }
                 free(clientes); // Libera a memória alocada
+                }else {
+                    printf("\nNenhum cliente encontrado.\n");
+                    pausarTerminal();
+                    }
                 break;
             }
             case 3:{
@@ -255,12 +260,22 @@ void menuCliente() {
                 break;
             }
             case 5:
-                adicionarClientesPadrao();
-                printf("Clientes padrão adicionados (se não duplicados).\n");
-                pausarTerminal();
+                if(quantidadeClientes == 0){
+                    if(adicionarClientesPadrao() == 1){
+                        printf("\nClientes padrão adicionados ao sistema.\n");
+                        pausarTerminal();
+                    }else{
+                        printf("\nErro ao adicionar clientes padrão ao sistema.\n");
+                        pausarTerminal();
+                    }
+                }else{
+                    printf("Opção inválida! Tente novamente.\n");
+                    pausarTerminal();
+                }
+                
                 break;
             case 0:
-                printf("Voltando para o Menu Principal...\n");
+                printf("\nVoltando para o Menu Principal...\n");
                 pausarTerminal();
                 break;
             default:
