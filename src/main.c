@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/cliente.h"
+#include "../include/pet.h"
 #include "../include/utils.h"
 
 //Cabeçalho das funções utilizadas na main
 void capturarString(const char *mensagem, char *destino, int tamanho);
 void menuPrincipal();
 void menuCliente();
+void menuPet();
 
 //fazer a void do menu princial
 int main() {
@@ -54,8 +56,7 @@ void menuPrincipal(){
                 break;
             }
             case 2:{ //Menu Pets
-                printf("\n[MENU PETS] Ainda não foi implementado!\n");
-                pausarTerminal();
+                menuPet();
                 break;
             }
             case 3:{ //Menu Serviços
@@ -283,6 +284,304 @@ void menuCliente() {
                 
                 break;
                 }
+            case 0:{ //Voltar para o Menu Principal
+                printf("\nVoltando para o Menu Principal...\n");
+                pausarTerminal();
+                break;
+            }
+            default:{ //Opção Inválida
+                printf("Opção inválida! Tente novamente.\n");
+                pausarTerminal();
+            break;
+            }
+        }
+    } while (opcao != 0);
+    
+}
+
+//função para acessar o menu do pet
+void menuPet() {
+    int opcao, quantidadePets;
+    do {
+        quantidadePets = contarPets();
+        limparTerminal();
+        printf("\n=== Menu Pet [%d no total] ===\n",quantidadePets);
+        printf("1 - Cadastrar Pet\n");
+        printf("2 - Listar Pets\n");
+        printf("3 - Atualizar Pet\n");
+        printf("4 - Excluir Pet\n");
+        printf("0 - Voltar ao Menu Principal\n");
+        printf("======================\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        fflush(stdin);
+
+        switch (opcao) {
+            case 1:{ //Cadastrar Pet
+                int codCliente, confirmaCliente, repeteCliente;
+                Pet pet;
+                Cliente *cliente;
+                limparTerminal();
+                printf("\n=== Cadastrar Novo Pet ===\n");
+                // Captura o Nome
+                capturarString("\nDigite o Nome: ", pet.nome, PET_MAX_NOME);  
+                // Captura a especie
+                capturarString("\nDigite a Espécie do Pet: ", pet.especie, PET_MAX_ESPECIE);
+                // Captura o Cliente
+                do{
+                    printf("\nDigite o ID do Cliente Responsável pelo Pet: %s: ",pet.nome);
+                    scanf("%d", &codCliente);
+                    fflush(stdin);
+                    cliente = buscarClientePeloID(codCliente);
+                    if(cliente){
+                        printf("\n=== Cliente Localizado pelo [ID] -> [%d] ===",codCliente);
+                        printf("\nID: %d, Nome: %s, Telefone: %s, CPF: %s\n",
+                            cliente->id, cliente->nome,
+                            cliente->telefone, cliente->cpf);
+                        printf("\nDigite [1] para CONFIRMAR, [2] para ALTERAR o Cliente ou [0] para CANCELAR: ");
+                        scanf("%d", &confirmaCliente);
+                        fflush(stdin);
+                        switch (confirmaCliente){
+                            case 1:{
+                                pet.codCliente = codCliente;
+                                repeteCliente = 0;
+                                break;
+                            }
+                            case 2:{
+                                repeteCliente = 1;
+                                break;
+                            }
+                            case 0:{
+                                repeteCliente = 2;
+                                printf("\nCancelando o Cadastro do Pet: %s\n",pet.nome);
+                                pausarTerminal();
+                                break;
+                            }                                      
+                            default:{
+                                repeteCliente = 1;
+                                printf("\nOpção inválida!");
+                                pausarTerminal();
+                                break;
+                            }
+                        }
+                    }else{
+                        printf("\nNão foi encontrado um cliente com [ID] -> [%d]\n",codCliente);
+                        pausarTerminal();
+                    }
+                }while(repeteCliente != 0 && repeteCliente != 2);
+                
+                if(repeteCliente == 0){
+                    // Gerar o ID do Pet
+                    pet.id = gerarProximoIDPet();
+                    switch (salvarPet(pet)){
+                        case 1:{
+                            printf("\nPet cadastrado com sucesso! ID: %d\n", pet.id);
+                            pausarTerminal();
+                            break;
+                            }
+                        case 0:{
+                            perror("\nErro ao abrir o arquivo original da base de dados");
+                            pausarTerminal();
+                            break;
+                            }
+                        default:{
+                            perror("\nErro ao tentar cadastrar o pet");
+                            pausarTerminal();
+                            break;
+                            }
+                    }
+                }
+                free(cliente);
+                break;
+            }
+            case 2:{ //Listar Pets
+                quantidadePets = contarPets();
+                if (quantidadePets > 0) {
+                    // Chama a função listarPets
+                    Pet *pets = listarPets(quantidadePets);
+                    if(pets){
+                            Cliente *cliente;
+                            limparTerminal();
+                            printf("\n=== Lista de Pets [%d no total]===\n\n",quantidadePets);
+                            for (int i = 0; i < quantidadePets; i++) {//listar também as informações do cliente...
+                                cliente = buscarClientePeloID(pets[i].codCliente);
+                                if(cliente){
+                                    printf("ID: %d, Nome: %s, Espécie: %s, ID do Cliente: %d, Nome do Cliente: %s, Telefone: %s, CPF: %s\n",
+                                    pets[i].id, pets[i].nome,
+                                    pets[i].especie, pets[i].codCliente, cliente->nome, cliente->telefone, cliente->cpf);
+                                }else{
+                                    printf("ID: %d, Nome: %s, Espécie: %s, ID do Cliente: %d [CLIENTE NÃO ENCONTRADO]\n",
+                                    pets[i].id, pets[i].nome,
+                                    pets[i].especie, pets[i].codCliente);
+                                }
+                                
+                            }
+                            free(cliente);
+                            pausarTerminal();
+                    }else{
+                        perror("\nErro ao abrir o banco de dados");
+                        pausarTerminal();
+                    }
+                    free(pets); // Libera a memória alocada
+                }else {
+                    printf("\nNenhum pet encontrado.\n");
+                    pausarTerminal();
+                    }
+                break;
+            }
+            case 3:{ //Atualizar Pet da pra melhorar, listando o cliente atual 
+                int id, codCliente, confirmaCliente, repeteCliente;
+                limparTerminal();
+                printf("\n=== Atualizar Pet ===\n\n");
+                printf("Digite o ID do pet a ser atualizado: ");
+                scanf("%d", &id);
+                Pet *petParaEnviar = buscarPetPeloID(id);
+                if(petParaEnviar){
+                    Cliente *cliente;
+                    printf("\n=== Pet Localizado pelo [ID] -> [%d] ===",id);//falta os dados do cliente aqui
+                    printf("\nID: %d, Nome: %s, Espécie: %s, ID do Cliente: %d\n",
+                            petParaEnviar->id, petParaEnviar->nome,
+                            petParaEnviar->especie, petParaEnviar->codCliente);
+                    // Captura o Nome
+                    printf("\nNome Atual: [%s] -> ",petParaEnviar->nome);
+                    capturarString("Digite o novo Nome: ", petParaEnviar->nome, PET_MAX_NOME);  
+                    // Captura a espécie
+                    printf("\nEspécie Atual: [%s] -> ",petParaEnviar->especie);
+                    capturarString("Digite a nova Espécie: ", petParaEnviar->especie, PET_MAX_ESPECIE);
+                    // Captura o ID do cliente
+                    do{
+                        printf("\nID do Cliente Atual: [%d] -> ",petParaEnviar->codCliente);
+                        printf("Digite o ID do Cliente Responsável pelo Pet: %s: ",petParaEnviar->nome);
+                        scanf("%d", &codCliente);
+                        fflush(stdin);
+                        cliente = buscarClientePeloID(codCliente);
+                        if(cliente){
+                            printf("\n=== Cliente Localizado pelo [ID] -> [%d] ===",codCliente);
+                            printf("\nID: %d, Nome: %s, Telefone: %s, CPF: %s\n",
+                                cliente->id, cliente->nome,
+                                cliente->telefone, cliente->cpf);
+                            printf("\nDigite [1] para CONFIRMAR, [2] para ALTERAR o Cliente ou [0] para CANCELAR: ");
+                            scanf("%d", &confirmaCliente);
+                            fflush(stdin);
+                            switch (confirmaCliente){
+                                case 1:{
+                                    petParaEnviar->codCliente = codCliente;
+                                    repeteCliente = 0;
+                                    break;
+                                }
+                                case 2:{
+                                    repeteCliente = 1;
+                                    break;
+                                }
+                                case 0:{
+                                    repeteCliente = 2;
+                                    printf("\nCancelando o Cadastro do Pet: %s\n",petParaEnviar->nome);
+                                    pausarTerminal();
+                                    break;
+                                }                                      
+                                default:{
+                                    repeteCliente = 1;
+                                    printf("\nOpção inválida!");
+                                    pausarTerminal();
+                                    break;
+                                }
+                            }
+                        }else{
+                            printf("\nNão foi encontrado um cliente com [ID] -> [%d]\n",codCliente);
+                            pausarTerminal();
+                        }
+                    }while(repeteCliente != 0 && repeteCliente != 2);
+                    
+                    if(repeteCliente == 0){
+                        switch (atualizarPet(petParaEnviar)){
+                            case 0:
+                                printf("\nSucesso ao atualizar pet com [ID] -> [%d]\n",id);
+                                pausarTerminal();
+                                break;
+                            case 1:
+                                perror("\nErro ao abrir o arquivo original da base de dados");
+                                pausarTerminal();
+                                break;
+                            case 2:
+                                perror("\nErro ao criar o arquivo temporário da base de dados");
+                                pausarTerminal();
+                                break;
+                            case 3:
+                                printf("\nNão foi encontrado um pet com [ID] -> [%d]\n",id);
+                                pausarTerminal();
+                                break;
+                            default:
+                                perror("\nErro ao tentar atualizar o pet");
+                                pausarTerminal();
+                                break;
+                        }
+                    }
+                    free(cliente);   
+                }else{
+                    printf("\nNão foi encontrado um pet com [ID] -> [%d]\n",id);
+                    pausarTerminal();
+                }
+                free(petParaEnviar);
+                break;
+            }
+            case 4:{ //Excluir Pet da pra melhorar listando o cliente quando o pet for encontrado
+                int id;
+                limparTerminal();
+                printf("\n=== Excluir Pet ===\n\n");
+                printf("Digite o ID do pet a ser excluído: ");
+                scanf("%d", &id);
+                Pet *pet = buscarPetPeloID(id);
+                if(pet){
+                    int subOpcao;
+                    printf("\n=== Pet Localizado pelo [ID] -> [%d] ===",id);
+                    printf("\nID: %d, Nome: %s, Espécie: %s, ID do Cliente: %d\n",
+                            pet->id, pet->nome,
+                            pet->especie, pet->codCliente);
+                    do{
+                        printf("\nDigite [1] para CANCELAR ou [2] para EXCLUIR permanentemente: ");
+                        scanf("%d", &subOpcao);
+                        switch (subOpcao){
+                            case 1:
+                            printf("\n\nCancelando exclusão...");
+                            pausarTerminal();
+                            break;
+                            case 2:
+                                switch (excluirPet(id)){
+                                    case 0:
+                                        printf("\nSucesso ao excluir pet com [ID] -> [%d]\n",id);
+                                        pausarTerminal();
+                                        break;
+                                    case 1:
+                                        perror("\nErro ao abrir o arquivo original da base de dados");
+                                        pausarTerminal();
+                                        break;
+                                    case 2:
+                                        perror("\nErro ao criar o arquivo temporário da base de dados");
+                                        pausarTerminal();
+                                        break;
+                                    case 3:
+                                        printf("\nNão foi encontrado um pet com [ID] -> [%d]\n",id);
+                                        pausarTerminal();
+                                        break;
+                                    default:
+                                        perror("\nErro ao tentar excluir o pet");
+                                        pausarTerminal();
+                                        break;
+                                }
+                            break;
+                            default:
+                            printf("\nOpção inválida!");
+                            pausarTerminal();
+                            break;
+                        }
+                    }while (subOpcao != 1 && subOpcao != 2);
+                }else{
+                    printf("\nNão foi encontrado um pet com [ID] -> [%d]\n",id);
+                    pausarTerminal();
+                }
+                free(pet);
+                break;
+            }
             case 0:{ //Voltar para o Menu Principal
                 printf("\nVoltando para o Menu Principal...\n");
                 pausarTerminal();
