@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../include/cliente.h"
 #include "../include/pet.h"
+#include "../include/servico.h"
 #include "../include/utils.h"
 
 //Cabeçalho das funções utilizadas na main
@@ -10,6 +11,7 @@ void capturarString(const char *mensagem, char *destino, int tamanho);
 void menuPrincipal();
 void menuCliente();
 void menuPet();
+void menuServico();
 
 //fazer a void do menu princial
 int main() {
@@ -60,8 +62,7 @@ void menuPrincipal(){
                 break;
             }
             case 3:{ //Menu Serviços
-                printf("\n[MENU SERVIÇOS] Ainda não foi implementado!\n");
-                pausarTerminal();
+                menuServico();
                 break;
             }
             case 4:{ //Menu Serviços Prestados
@@ -582,6 +583,247 @@ void menuPet() {
                 free(pet);
                 break;
             }
+            case 0:{ //Voltar para o Menu Principal
+                printf("\nVoltando para o Menu Principal...\n");
+                pausarTerminal();
+                break;
+            }
+            default:{ //Opção Inválida
+                printf("Opção inválida! Tente novamente.\n");
+                pausarTerminal();
+            break;
+            }
+        }
+    } while (opcao != 0);
+    
+}
+
+//função para acessar o menu de Servicos
+void menuServico(){ 
+    int opcao, quantidadeServicos;
+    do {
+        quantidadeServicos = contarServicos();
+        limparTerminal();
+        printf("\n=== Menu Serviços [%d no total] ===\n",quantidadeServicos);
+        printf("1 - Cadastrar Serviço\n");
+        printf("2 - Listar Serviços\n");
+        printf("3 - Atualizar Serviço\n");
+        printf("4 - Excluir Serviço\n");
+        if(quantidadeServicos == 0){
+            printf("5 - Adicionar Serviços Padrão\n");
+        }
+        printf("0 - Voltar ao Menu Principal\n");
+        printf("======================\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        fflush(stdin);
+
+        switch (opcao) {
+            case 1:{ //Cadastrar Servico
+                Servico servico;
+                limparTerminal();
+                printf("\n=== Cadastrar Novo Serviço ===\n");
+                // Captura o Nome
+                capturarString("\nDigite o Nome: ", servico.nome, SERVICO_MAX_NOME);  
+                // Captura o custo
+                // Captura o valor cobrado
+                do{
+                    printf("\nDigite o Valor de Custo: ");
+                    scanf("%f",&servico.valorCusto);
+                    fflush(stdin);
+                    printf("\nDigite o Valor de Cobrado: ");
+                    scanf("%f",&servico.valorCobrado);
+                    fflush(stdin);
+                    if(servico.valorCusto > servico.valorCobrado){
+                        printf("\nO Valor de Custo [R$ %.2f] não pode ser superior ao Valor Cobrado [R$ %.2f]\n",servico.valorCusto, servico.valorCobrado);
+                        printf("\nInforme novamente os valores para o serviço: %s!\n",servico.nome);
+                        pausarTerminal();
+                    }
+                }while(servico.valorCusto > servico.valorCobrado);
+                // Gerar o ID do servico
+                servico.id = gerarProximoIDServico();
+                switch (salvarServico(servico)){
+                    case 1:{
+                        printf("\nServiço cadastrado com sucesso! ID: %d\n", servico.id);
+                        pausarTerminal();
+                        break;
+                        }
+                    case 0:{
+                        perror("\nErro ao abrir o arquivo original da base de dados");
+                        pausarTerminal();
+                        break;
+                        }
+                    default:{
+                        perror("\nErro ao tentar cadastrar o cliente");
+                        pausarTerminal();
+                        break;
+                        }
+                }
+                break;
+            }
+            case 2:{ //Listar Servicos
+                quantidadeServicos = contarServicos();
+                if (quantidadeServicos > 0) {
+                // Chama a função listarServicos
+                Servico *servicos = listarServicos(quantidadeServicos);
+                if(servicos){
+                        limparTerminal();
+                        printf("\n=== Lista de Serviços [%d no total]===\n\n",quantidadeServicos);
+                        for (int i = 0; i < quantidadeServicos; i++) {
+                            printf("\nID: %d, Nome: %s, Valor Cobrado: R$ %.2f | Custo: R$ %.2f | Lucro: R$ %.2f\n",
+                                servicos[i].id, servicos[i].nome,
+                                servicos[i].valorCobrado, servicos[i].valorCusto,
+                                (servicos[i].valorCobrado - servicos[i].valorCusto));
+                        }
+                        pausarTerminal();
+                }else{
+                    perror("\nErro ao abrir o banco de dados");
+                    pausarTerminal();
+                }
+                free(servicos); // Libera a memória alocada
+                }else {
+                    printf("\nNenhum serviço encontrado.\n");
+                    pausarTerminal();
+                    }
+                break;
+            }
+            case 3:{ //Atualizar Serviço
+                int id;
+                limparTerminal();
+                printf("\n=== Atualizar Serviço ===\n\n");
+                printf("Digite o ID do serviço a ser atualizado: ");
+                scanf("%d", &id);
+                Servico *servicoParaEnviar = buscarServicoPeloID(id);
+                if(servicoParaEnviar){
+                    printf("\n=== Serviço Localizado pelo [ID] -> [%d] ===",id);
+                    printf("\nID: %d, Nome: %s, Valor Cobrado: R$ %.2f | Custo: R$ %.2f | Lucro: R$ %.2f\n",
+                            servicoParaEnviar->id, servicoParaEnviar->nome,
+                            servicoParaEnviar->valorCobrado, servicoParaEnviar->valorCusto,
+                            (servicoParaEnviar->valorCobrado - servicoParaEnviar->valorCusto));
+                    // Captura o Nome
+                    printf("\nNome Atual: [%s] -> ",servicoParaEnviar->nome);
+                    capturarString("Digite o novo Nome: ", servicoParaEnviar->nome, SERVICO_MAX_NOME);  
+                    do{
+                        // Captura o custo
+                        printf("\nValor de Custo Atual: [R$ %.2f] -> ",servicoParaEnviar->valorCusto);
+                        printf("Digite o novo Valor de Custo: ");
+                        scanf("%f",&servicoParaEnviar->valorCusto);
+                        fflush(stdin);
+                        // Captura o valor cobrado
+                        printf("\nValor Cobrado Atualmente: [R$ %.2f] -> ",servicoParaEnviar->valorCobrado);
+                        printf("Digite o novo Valor Cobrado: ");
+                        scanf("%f",&servicoParaEnviar->valorCobrado);
+                        fflush(stdin);
+                        if(servicoParaEnviar->valorCusto > servicoParaEnviar->valorCobrado){
+                            printf("\nO Valor de Custo [R$ %.2f] não pode ser superior ao Valor Cobrado [R$ %.2f]\n",servicoParaEnviar->valorCusto, servicoParaEnviar->valorCobrado);
+                            printf("\nInforme novamente os valores para o serviço: %s!\n",servicoParaEnviar->nome);
+                            pausarTerminal();
+                        }
+                    }while(servicoParaEnviar->valorCusto > servicoParaEnviar->valorCobrado);
+                    switch (atualizarServico(servicoParaEnviar)){
+                        case 0:
+                            printf("\nSucesso ao atualizar servico com [ID] -> [%d]\n",id);
+                            pausarTerminal();
+                            break;
+                        case 1:
+                            perror("\nErro ao abrir o arquivo original da base de dados");
+                            pausarTerminal();
+                            break;
+                        case 2:
+                            perror("\nErro ao criar o arquivo temporário da base de dados");
+                            pausarTerminal();
+                            break;
+                        case 3:
+                             printf("\nNão foi encontrado um servico com [ID] -> [%d]\n",id);
+                             pausarTerminal();
+                            break;
+                        default:
+                            perror("\nErro ao tentar atualizar o servico");
+                            pausarTerminal();
+                            break;
+                    }
+                }else{
+                    printf("\nNão foi encontrado um servico com [ID] -> [%d]\n",id);
+                    pausarTerminal();
+                }
+                free(servicoParaEnviar);
+                break;
+            }
+            case 4:{ //Excluir Serviço
+                int id;
+                limparTerminal();
+                printf("\n=== Excluir Serviço ===\n\n");
+                printf("Digite o ID do serviço a ser excluído: ");
+                scanf("%d", &id);
+                Servico *servico = buscarServicoPeloID(id);
+                if(servico){
+                    int subOpcao;
+                    printf("\n=== Serviço Localizado pelo [ID] -> [%d] ===",id);
+                    printf("ID: %d, Nome: %s, Valor Cobrado: R$ %.2f | Custo: R$ %.2f | Lucro: R$ %.2f\n",
+                                servico->id, servico->nome,
+                                servico->valorCobrado, servico->valorCusto,
+                                (servico->valorCobrado - servico->valorCusto));
+                    do{
+                        printf("\nDigite [1] para CANCELAR ou [2] para EXCLUIR permanentemente: ");
+                        scanf("%d", &subOpcao);
+                        switch (subOpcao){
+                            case 1:
+                            printf("\n\nCancelando exclusão...");
+                            pausarTerminal();
+                            break;
+                            case 2:
+                                switch (excluirServico(id)){
+                                    case 0:
+                                        printf("\nSucesso ao excluir serviço com [ID] -> [%d]\n",id);
+                                        pausarTerminal();
+                                        break;
+                                    case 1:
+                                        perror("\nErro ao abrir o arquivo original da base de dados");
+                                        pausarTerminal();
+                                        break;
+                                    case 2:
+                                        perror("\nErro ao criar o arquivo temporário da base de dados");
+                                        pausarTerminal();
+                                        break;
+                                    case 3:
+                                        printf("\nNão foi encontrado um serviço com [ID] -> [%d]\n",id);
+                                        pausarTerminal();
+                                        break;
+                                    default:
+                                        perror("\nErro ao tentar excluir o serviço");
+                                        pausarTerminal();
+                                        break;
+                                }
+                            break;
+                            default:
+                            printf("\nOpção inválida!");
+                            pausarTerminal();
+                            break;
+                        }
+                    }while (subOpcao != 1 && subOpcao != 2);
+                }else{
+                    printf("\nNão foi encontrado um serviço com [ID] -> [%d]\n",id);
+                    pausarTerminal();
+                }
+                free(servico);
+                break;
+            }
+            case 5:{ //Serviços Padrão
+                if(quantidadeServicos == 0){
+                    if(adicionarServicosPadrao() == 1){
+                        printf("\nServiços padrão adicionados ao sistema.\n");
+                        pausarTerminal();
+                    }else{
+                        printf("\nErro ao adicionar clientes padrão ao sistema.\n");
+                        pausarTerminal();
+                    }
+                }else{
+                    printf("Opção inválida! Tente novamente.\n");
+                    pausarTerminal();
+                }
+                
+                break;
+                }
             case 0:{ //Voltar para o Menu Principal
                 printf("\nVoltando para o Menu Principal...\n");
                 pausarTerminal();
