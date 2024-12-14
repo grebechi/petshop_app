@@ -4,6 +4,7 @@
 #include "../include/cliente.h"
 #include "../include/pet.h"
 #include "../include/servico.h"
+#include "../include/prestado.h"
 #include "../include/utils.h"
 
 //Cabeçalho das funções utilizadas na main
@@ -12,6 +13,7 @@ void menuPrincipal();
 void menuCliente();
 void menuPet();
 void menuServico();
+void menuPrestado();
 
 //fazer a void do menu princial
 int main() {
@@ -66,8 +68,7 @@ void menuPrincipal(){
                 break;
             }
             case 4:{ //Menu Serviços Prestados
-                printf("\n[MENU SERVIÇOS PRESTADOS] Ainda não foi implementado!\n");
-                pausarTerminal();
+                menuPrestado();
                 break;
             }
             case 0:{ //Sair do Sistema
@@ -837,4 +838,523 @@ void menuServico(){
         }
     } while (opcao != 0);
     
+}
+
+//função para acessar o menu de Servicos Prestados
+void menuPrestado(){
+    int opcao, quantidadePrestados;
+    do {
+        quantidadePrestados = contarPrestados();
+        limparTerminal();
+        printf("\n=== Menu Serviços Prestados [%d no total] ===\n",quantidadePrestados);
+        printf("1 - Registrar Serviço Prestado\n");
+        printf("2 - Listar Serviços Prestados\n");
+        printf("3 - Atualizar Serviço Prestado\n");
+        printf("4 - Excluir Serviço Prestado\n");
+        printf("0 - Voltar ao Menu Principal\n");
+        printf("======================\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        fflush(stdin);
+
+        switch (opcao) {
+            case 1:{ //Cadastrar Serviço Prestado 
+                int qtdPets, codPet, confirmaPet, repetePet, qtdServico, codServico, confirmaServico, repeteServico;
+                qtdPets = contarPets();
+                qtdServico = contarServicos();
+                if(qtdPets > 0 && qtdServico > 0){
+                    Prestado prestado;
+                    Pet *pet;
+                    Cliente *cliente;
+                    Servico *servico;
+                    limparTerminal();
+                    printf("\n=== Registrar Novo Serviço Prestado ===\n");
+                    // Captura a data
+                    capturarString("\nDigite a Data[DD/MM/AAAA]: ", prestado.data, PRESTADO_MAX_DATA);
+                    // Captura o Pet
+                    do{
+                        printf("\nDigite o ID do Pet: ");
+                        scanf("%d", &codPet);
+                        fflush(stdin);
+                        pet = buscarPetPeloID(codPet);
+                        if(pet){
+                            cliente = buscarClientePeloID(pet->codCliente);
+                            if(cliente){
+                                printf("\n=== Pet Localizado pelo [ID] -> [%d] ===",codPet);
+                                printf("\nID: %d, Nome: %s, Espécie: %s, ID do Cliente: %d, Nome do Cliente: %s, Telefone: %s, CPF: %s\n",
+                                        pet->id, pet->nome,
+                                        pet->especie, pet->codCliente, cliente->nome, cliente->telefone, cliente->cpf);
+                            }else{
+                                printf("\n=== Pet Localizado pelo [ID] -> [%d] ===",codPet);
+                                printf("\nID: %d, Nome: %s, Espécie: %s, ID do Cliente: %d [CLIENTE NÃO ENCONTRADO]\n",
+                                        pet->id, pet->nome,
+                                        pet->especie, pet->codCliente);
+                            }
+                            
+                            printf("\nDigite [1] para CONFIRMAR, [2] para ALTERAR o Pet ou [0] para CANCELAR: ");
+                            scanf("%d", &confirmaPet);
+                            fflush(stdin);
+                            switch (confirmaPet){
+                                case 1:{
+                                    prestado.codPet = codPet;
+                                    repetePet = 0;
+                                    break;
+                                }
+                                case 2:{
+                                    repetePet = 1;
+                                    break;
+                                }
+                                case 0:{
+                                    repetePet = 2;
+                                    printf("\nCancelando o Registro do Serviço Prestado na data: %s\n",prestado.data);
+                                    pausarTerminal();
+                                    break;
+                                }                                      
+                                default:{
+                                    repetePet = 1;
+                                    printf("\nOpção inválida!");
+                                    pausarTerminal();
+                                    break;
+                                }
+                            }
+                        }else{
+                            printf("\nNão foi encontrado um pet com [ID] -> [%d]\n",codPet);
+                            pausarTerminal();
+                        }
+                    }while(repetePet != 0 && repetePet != 2);
+                    if(repetePet == 0){
+                        // Captura o Servico
+                        do{
+                            printf("\nDigite o ID do Serviço: ");
+                            scanf("%d", &codServico);
+                            fflush(stdin);
+                            servico = buscarServicoPeloID(codServico);
+                            if(servico){
+                                printf("\n=== Serviço Localizado pelo [ID] -> [%d] ===\n",codServico);
+                                printf("ID: %d, Nome: %s, Valor Cobrado: R$ %.2f | Custo: R$ %.2f | Lucro: R$ %.2f\n",
+                                            servico->id, servico->nome,
+                                            servico->valorCobrado, servico->valorCusto,
+                                            (servico->valorCobrado - servico->valorCusto));
+                                
+                                printf("\nDigite [1] para CONFIRMAR, [2] para ALTERAR o Pet ou [0] para CANCELAR: ");
+                                scanf("%d", &confirmaServico);
+                                fflush(stdin);
+                                switch (confirmaServico){
+                                    case 1:{
+                                        prestado.codServico = codServico;
+                                        repeteServico = 0;
+                                        break;
+                                    }
+                                    case 2:{
+                                        repeteServico = 1;
+                                        break;
+                                    }
+                                    case 0:{
+                                        repeteServico = 2;
+                                        printf("\nCancelando o Registro do Serviço Prestado na data: %s\n",prestado.data);
+                                        pausarTerminal();
+                                        break;
+                                    }                                      
+                                    default:{
+                                        repeteServico = 1;
+                                        printf("\nOpção inválida!");
+                                        pausarTerminal();
+                                        break;
+                                    }
+                                }
+                            }else{
+                                printf("\nNão foi encontrado um serviço com [ID] -> [%d]\n",codServico);
+                                pausarTerminal();
+                            }
+                        }while(repeteServico != 0 && repeteServico != 2);
+
+                        //verifica se o usuário decidiu cancelar ou registrar o serviço prestado
+                        if(repetePet == 0 && repeteServico == 0){
+                            //salva o lucro do serviço
+                            prestado.lucro = (servico->valorCobrado - servico->valorCusto);
+                            // Gerar o ID do serviço prestado
+                            prestado.id = gerarProximoIDPrestado();
+                            switch (salvarPrestado(prestado)){
+                                case 1:{
+                                    printf("\nServiço Prestado registrado com sucesso! ID: %d\n", prestado.id);
+                                    pausarTerminal();
+                                    break;
+                                    }
+                                case 0:{
+                                    perror("\nErro ao abrir o arquivo original da base de dados");
+                                    pausarTerminal();
+                                    break;
+                                    }
+                                default:{
+                                    perror("\nErro ao tentar registrar o Serviço Prestado");
+                                    pausarTerminal();
+                                    break;
+                                    }
+                            }
+                        }
+                    }
+                    free(pet);
+                    free(cliente);
+                    free(servico);
+                }else{
+                    printf("\n=== Não é possível Registrar um Novo Serviço Prestado! ===\n");
+                    if(qtdPets == 0){
+                        printf("Nenhum Pet cadastrado no sistema.\n");
+                    }
+                    if(qtdServico == 0){
+                        printf("Nenhum Serviço cadastrado no sistema.\n");
+                    }
+                    pausarTerminal();
+                }
+                break;
+            }
+            case 2:{ //Listar Serviços Prestados lucro aumenta toda vez que chama
+                quantidadePrestados = contarPrestados();
+                if (quantidadePrestados > 0) {
+                    // Chama a função listarPrestados
+                    Prestado *prestados = listarPrestados(quantidadePrestados);
+                    if(prestados){
+                            float lucroTotal;
+                            Pet *pet;
+                            Cliente *cliente;
+                            Servico *servico;
+                            limparTerminal();
+                            printf("\n=== Lista de Serviços Prestados [%d no total]===\n\n",quantidadePrestados);
+                            for (int i = 0; i < quantidadePrestados; i++) {
+                                lucroTotal = lucroTotal + prestados[i].lucro;
+                                printf("ID: %d, Data: %s \nID do Serviço: %d, ",
+                                prestados[i].id, prestados[i].data, prestados[i].codServico);
+                                pet = buscarPetPeloID(prestados[i].codPet);
+                                servico = buscarServicoPeloID(prestados[i].codServico);
+                                if(servico){
+                                    printf("Nome: %s, Valor Cobrado: [R$ %.2f] | Custo: [R$ %.2f] | Lucro: [R$ %.2f]\n",
+                                    servico->nome, servico->valorCobrado, servico->valorCusto, prestados[i].lucro);
+                                }else{
+                                    printf("[SERVIÇO NÃO ENCONTRADO] | Lucro: [R$ %.2f]\n", prestados[i].lucro);
+                                }
+                                printf("ID do Pet: %d, ", prestados[i].codPet);
+                                if(pet){
+                                    printf("Nome: %s, Espécie: %s \nID do Cliente Responsável: %d, ",
+                                    pet->nome, pet->especie, pet->codCliente);
+                                    cliente = buscarClientePeloID(pet->codCliente);
+                                    if(cliente){
+                                        printf("Nome: %s, Telefone: %s, CPF: %s\n\n",
+                                        cliente->nome, cliente->telefone, cliente->cpf);
+                                    }else{
+                                        printf("[CLIENTE NÃO ENCONTRADO]\n\n");
+                                    }
+                                }else{
+                                    printf("[PET e CLIENTE NÃO ENCONTRADOS]\n\n");
+                                }   
+                            }
+                            free(pet);
+                            free(cliente);
+                            free(servico);
+                            printf("\n=== Lucro Total dos Serviços Prestados R$ %.2f ===\n\n",lucroTotal);
+                            lucroTotal = 0;
+                            pausarTerminal();
+                    }else{
+                        perror("\nErro ao abrir o banco de dados");
+                        pausarTerminal();
+                    }
+                    free(prestados); // Libera a memória alocada
+                }else {
+                    printf("\nNenhum Serviço Prestado encontrado.\n");
+                    pausarTerminal();
+                    }
+                break;
+            }
+            case 3:{ //Atualizar Serviços Prestados 
+                int id, qtdPets, codPet, confirmaPet, repetePet, qtdServico, codServico, confirmaServico, repeteServico;
+                qtdPets = contarPets();
+                qtdServico = contarServicos();
+                limparTerminal();
+                if(qtdPets > 0 && qtdServico > 0){
+                    printf("\n=== Atualizar Serviço Prestado ===\n\n");
+                    printf("Digite o ID do Serviço Prestado a ser atualizado: ");
+                    scanf("%d", &id);
+                    Prestado *prestadoParaEnviar = buscarPrestadoPeloID(id);
+                    if(prestadoParaEnviar){
+                        Pet *pet;
+                        Cliente *cliente;
+                        Servico *servico;
+                        printf("\n=== Serviço Prestado Localizado pelo [ID] -> [%d] ===\n",id);//falta os dados do cliente aqui
+                        printf("ID: %d, Data: %s \nID do Serviço: %d, ",
+                                    prestadoParaEnviar->id, prestadoParaEnviar->data, prestadoParaEnviar->codServico);
+                        pet = buscarPetPeloID(prestadoParaEnviar->codPet);
+                        servico = buscarServicoPeloID(prestadoParaEnviar->codServico);
+                        if(servico){
+                            printf("Nome: %s, Valor Cobrado: [R$ %.2f] | Custo: [R$ %.2f] | Lucro: [R$ %.2f]\n",
+                            servico->nome, servico->valorCobrado, servico->valorCusto, prestadoParaEnviar->lucro);
+                        }else{
+                            printf("[SERVIÇO NÃO ENCONTRADO] | Lucro: [R$ %.2f]\n", prestadoParaEnviar->lucro);
+                        }
+                        printf("ID do Pet: %d, ", prestadoParaEnviar->codPet);
+                        if(pet){
+                            printf("Nome: %s, Espécie: %s \nID do Cliente Responsável: %d, ",
+                            pet->nome, pet->especie, pet->codCliente);
+                            cliente = buscarClientePeloID(pet->codCliente);
+                            if(cliente){
+                                printf("Nome: %s, Telefone: %s, CPF: %s\n\n",
+                                cliente->nome, cliente->telefone, cliente->cpf);
+                            }else{
+                                printf("[CLIENTE NÃO ENCONTRADO]\n\n");
+                            }
+                        }else{
+                            printf("[PET e CLIENTE NÃO ENCONTRADOS]\n\n");
+                        }
+
+                        // Captura a data
+                        printf("\nData Atual: %s -> ", prestadoParaEnviar->data);
+                        capturarString("Digite a nova Data[DD/MM/AAAA]: ", prestadoParaEnviar->data, PRESTADO_MAX_DATA);
+                        // Captura o Pet
+                        do{
+                            printf("\nID do Pet Atual: [%d] -> ", prestadoParaEnviar->codPet);
+                            printf("Digite o novo ID do Pet: ");
+                            scanf("%d", &codPet);
+                            fflush(stdin);
+                            pet = buscarPetPeloID(codPet);
+                            if(pet){
+                                cliente = buscarClientePeloID(pet->codCliente);
+                                if(cliente){
+                                    printf("\n=== Pet Localizado pelo [ID] -> [%d] ===",codPet);
+                                    printf("\nID: %d, Nome: %s, Espécie: %s, ID do Cliente: %d, Nome do Cliente: %s, Telefone: %s, CPF: %s\n",
+                                            pet->id, pet->nome,
+                                            pet->especie, pet->codCliente, cliente->nome, cliente->telefone, cliente->cpf);
+                                }else{
+                                    printf("\n=== Pet Localizado pelo [ID] -> [%d] ===",codPet);
+                                    printf("\nID: %d, Nome: %s, Espécie: %s, ID do Cliente: %d [CLIENTE NÃO ENCONTRADO]\n",
+                                            pet->id, pet->nome,
+                                            pet->especie, pet->codCliente);
+                                }
+                                
+                                printf("\nDigite [1] para CONFIRMAR, [2] para ALTERAR o Pet ou [0] para CANCELAR: ");
+                                scanf("%d", &confirmaPet);
+                                fflush(stdin);
+                                switch (confirmaPet){
+                                    case 1:{
+                                        prestadoParaEnviar->codPet = codPet;
+                                        repetePet = 0;
+                                        break;
+                                    }
+                                    case 2:{
+                                        repetePet = 1;
+                                        break;
+                                    }
+                                    case 0:{
+                                        repetePet = 2;
+                                        printf("\nCancelando o Registro do Serviço Prestado na data: %s\n",prestadoParaEnviar->data);
+                                        pausarTerminal();
+                                        break;
+                                    }                                      
+                                    default:{
+                                        repetePet = 1;
+                                        printf("\nOpção inválida!");
+                                        pausarTerminal();
+                                        break;
+                                    }
+                                }
+                            }else{
+                                printf("\nNão foi encontrado um pet com [ID] -> [%d]\n",codPet);
+                                repetePet = 1;
+                                pausarTerminal();
+                            }
+                        }while(repetePet != 0 && repetePet != 2);
+                        if(repetePet == 0){
+                            // Captura o Servico
+                            do{
+                                printf("\nID do Serviço Atual: [%d] -> ", prestadoParaEnviar->codServico);
+                                printf("Digite o novo ID do Serviço: ");
+                                scanf("%d", &codServico);
+                                fflush(stdin);
+                                servico = buscarServicoPeloID(codServico);
+                                if(servico){
+                                    printf("\n=== Serviço Localizado pelo [ID] -> [%d] ===\n",codServico);
+                                    printf("ID: %d, Nome: %s, Valor Cobrado: R$ %.2f | Custo: R$ %.2f | Lucro: R$ %.2f\n",
+                                                servico->id, servico->nome,
+                                                servico->valorCobrado, servico->valorCusto,
+                                                (servico->valorCobrado - servico->valorCusto));
+                                    
+                                    printf("\nDigite [1] para CONFIRMAR, [2] para ALTERAR o Pet ou [0] para CANCELAR: ");
+                                    scanf("%d", &confirmaServico);
+                                    fflush(stdin);
+                                    switch (confirmaServico){
+                                        case 1:{
+                                            prestadoParaEnviar->codServico = codServico;
+                                            repeteServico = 0;
+                                            break;
+                                        }
+                                        case 2:{
+                                            repeteServico = 1;
+                                            break;
+                                        }
+                                        case 0:{
+                                            repeteServico = 2;
+                                            printf("\nCancelando o Registro do Serviço Prestado na data: %s\n",prestadoParaEnviar->data);
+                                            pausarTerminal();
+                                            break;
+                                        }                                      
+                                        default:{
+                                            repeteServico = 1;
+                                            printf("\nOpção inválida!");
+                                            pausarTerminal();
+                                            break;
+                                        }
+                                    }
+                                }else{
+                                    printf("\nNão foi encontrado um serviço com [ID] -> [%d]\n",codServico);
+                                    repeteServico = 1;
+                                    pausarTerminal();
+                                }
+                            }while(repeteServico != 0 && repeteServico != 2);
+                        }
+                        //verifica se o usuário decidiu cancelar ou registrar o serviço prestado
+                        if(repetePet == 0 && repeteServico == 0){
+                            //salva o lucro do serviço
+                            prestadoParaEnviar->lucro = (servico->valorCobrado - servico->valorCusto);
+                            switch (atualizarPrestado(prestadoParaEnviar)){
+                                case 0:
+                                    printf("\nSucesso ao atualizar Serviço Prestado com [ID] -> [%d]\n",id);
+                                    pausarTerminal();
+                                    break;
+                                case 1:
+                                    perror("\nErro ao abrir o arquivo original da base de dados");
+                                    pausarTerminal();
+                                    break;
+                                case 2:
+                                    perror("\nErro ao criar o arquivo temporário da base de dados");
+                                    pausarTerminal();
+                                    break;
+                                case 3:
+                                    printf("\nNão foi encontrado um Serviço Prestado com [ID] -> [%d]\n",id);
+                                    pausarTerminal();
+                                    break;
+                                default:
+                                    perror("\nErro ao tentar atualizar o Serviço Prestado");
+                                    pausarTerminal();
+                                    break;
+                            }
+                        }
+                        free(pet);
+                        free(cliente);
+                        free(servico);
+
+                    }else{
+                        printf("\nNão foi encontrado um Serviço Prestado com [ID] -> [%d]\n",id);
+                        pausarTerminal();
+                    }
+                    free(prestadoParaEnviar);
+
+                }else{
+                    printf("\n=== Não é possível Atualizar um Serviço Prestado! ===\n");
+                    if(qtdPets == 0){
+                        printf("Nenhum Pet cadastrado no sistema.\n");
+                    }
+                    if(qtdServico == 0){
+                        printf("Nenhum Serviço cadastrado no sistema.\n");
+                    }
+                    pausarTerminal();
+                }
+
+                break;
+            }
+            
+            case 4:{ //Excluir Serviço Prestado
+                int id;
+                limparTerminal();
+                printf("\n=== Excluir Serviço Prestado ===\n\n");
+                printf("Digite o ID do Serviço Prestado a ser excluído: ");
+                scanf("%d", &id);
+                Prestado *prestado = buscarPrestadoPeloID(id);
+                if(prestado){
+                    int subOpcao;
+                    Pet *pet;
+                    Cliente *cliente;
+                    Servico *servico;
+                    printf("\n=== Serviço Prestado Localizado pelo [ID] -> [%d] ===\n",id);
+                    printf("ID: %d, Data: %s \nID do Serviço: %d, ",
+                                prestado->id, prestado->data, prestado->codServico);
+                    pet = buscarPetPeloID(prestado->codPet);
+                    servico = buscarServicoPeloID(prestado->codServico);
+                    if(servico){
+                        printf("Nome: %s, Valor Cobrado: [R$ %.2f] | Custo: [R$ %.2f] | Lucro: [R$ %.2f]\n",
+                        servico->nome, servico->valorCobrado, servico->valorCusto, prestado->lucro);
+                    }else{
+                        printf("[SERVIÇO NÃO ENCONTRADO] | Lucro: [R$ %.2f]\n", prestado->lucro);
+                    }
+                    printf("ID do Pet: %d, ", prestado->codPet);
+                    if(pet){
+                        printf("Nome: %s, Espécie: %s \nID do Cliente Responsável: %d, ",
+                        pet->nome, pet->especie, pet->codCliente);
+                        cliente = buscarClientePeloID(pet->codCliente);
+                        if(cliente){
+                            printf("Nome: %s, Telefone: %s, CPF: %s\n\n",
+                            cliente->nome, cliente->telefone, cliente->cpf);
+                        }else{
+                            printf("[CLIENTE NÃO ENCONTRADO]\n\n");
+                        }
+                    }else{
+                        printf("[PET e CLIENTE NÃO ENCONTRADOS]\n\n");
+                    }
+                    free(pet);
+                    free(cliente);
+                    free(servico);
+
+                    do{
+                        printf("\nDigite [1] para CANCELAR ou [2] para EXCLUIR permanentemente: ");
+                        scanf("%d", &subOpcao);
+                        switch (subOpcao){
+                            case 1:
+                            printf("\n\nCancelando exclusão...");
+                            pausarTerminal();
+                            break;
+                            case 2:
+                                switch (excluirPrestado(id)){
+                                    case 0:
+                                        printf("\nSucesso ao excluir Serviço Prestado com [ID] -> [%d]\n",id);
+                                        pausarTerminal();
+                                        break;
+                                    case 1:
+                                        perror("\nErro ao abrir o arquivo original da base de dados");
+                                        pausarTerminal();
+                                        break;
+                                    case 2:
+                                        perror("\nErro ao criar o arquivo temporário da base de dados");
+                                        pausarTerminal();
+                                        break;
+                                    case 3:
+                                        printf("\nNão foi encontrado um Serviço Prestado com [ID] -> [%d]\n",id);
+                                        pausarTerminal();
+                                        break;
+                                    default:
+                                        perror("\nErro ao tentar excluir o Serviço Prestado");
+                                        pausarTerminal();
+                                        break;
+                                }
+                            break;
+                            default:
+                            printf("\nOpção inválida!");
+                            pausarTerminal();
+                            break;
+                        }
+                    }while (subOpcao != 1 && subOpcao != 2);
+                }else{
+                    printf("\nNão foi encontrado um Serviço Prestado com [ID] -> [%d]\n",id);
+                    pausarTerminal();
+                }
+                free(prestado);
+                break;
+            }
+            case 0:{ //Voltar para o Menu Principal
+                printf("\nVoltando para o Menu Principal...\n");
+                pausarTerminal();
+                break;
+            }
+            default:{ //Opção Inválida
+                printf("Opção inválida! Tente novamente.\n");
+                pausarTerminal();
+            break;
+            }
+        }
+    } while (opcao != 0);
 }
