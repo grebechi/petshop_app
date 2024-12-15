@@ -166,3 +166,53 @@ Prestado *buscarPrestadoPeloID(int id) {
     fclose(file);
     return NULL; // Serviço prestado não encontrado
 }
+
+Prestado *listarPrestadosPorPet(int idPet) { //falta implementar na main
+    FILE *file = fopen(ARQUIVO_PRESTADOS, "rb");
+    if (file == NULL) {
+        return NULL; // Arquivo inexistente
+    }
+
+    Prestado prestado;
+    int total = 0;
+
+    // Contar quantos Serviços Prestados estão vinculados ao idPet
+    while (fread(&prestado, sizeof(Prestado), 1, file)) {
+        if (prestado.codPet == idPet) {
+            total++;
+        }
+    }
+
+    // Se não há Serviços prestados vinculados, encerra
+    if (total == 0) {
+        fclose(file);
+        return NULL;
+    }
+
+    // Aloca memória para armazenar os pets vinculados
+    Prestado *prestados = (Prestado *)malloc((total + 1) * sizeof(Prestado)); //adiciona 1 Serviço Prestado a mais para definir o final do array
+    if (prestados == NULL) {
+        fclose(file);
+        return NULL; // Falha na alocação de memória
+    }
+
+    rewind(file); // Volta ao início do arquivo para ler novamente
+    int index = 0;
+
+    // Lê os serviços prestados vinculados ao idPet
+    while (fread(&prestado, sizeof(Prestado), 1, file)) {
+        if (prestado.codPet == idPet) {
+            prestados[index++] = prestado;
+        }
+    }
+
+    // Configura o marcador de término
+    prestados[index].id = -1;
+    prestados[index].data[0] = '\0';
+    prestados[index].codPet = -1;
+    prestados[index].codServico = -1;
+
+    fclose(file);
+
+    return prestados; // Retorna a lista de serviços prestados encontrados
+}

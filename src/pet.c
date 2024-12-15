@@ -167,7 +167,7 @@ Pet *buscarPetPeloID(int id) {
     return NULL; // Pet não encontrado
 }
 
-Pet *listarPetsPorCliente(int idCliente) { //falta implementar na main
+Pet *listarPetsPorCliente(int idCliente) { 
     FILE *file = fopen(ARQUIVO_PET, "rb");
     if (file == NULL) {
         return NULL; // Arquivo inexistente

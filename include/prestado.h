@@ -21,6 +21,7 @@ Prestado *listarPrestados(int quantidade);
 int atualizarPrestado(Prestado *prestadoRecebido);
 int excluirPrestado(int id);
 Prestado *buscarPrestadoPeloID(int id);
+Prestado *listarPrestadosPorPet(int idPet);
 
 #endif
 

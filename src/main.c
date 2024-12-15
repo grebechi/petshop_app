@@ -553,6 +553,7 @@ void menuPet() {
                 printf("Digite o ID do pet a ser excluído: ");
                 scanf("%d", &id);
                 Pet *pet = buscarPetPeloID(id);
+                Prestado *prestadosVinculados;
                 if(pet){
                     int subOpcao;
                     printf("\n=== Pet Localizado pelo [ID] -> [%d] ===",id);
@@ -568,28 +569,73 @@ void menuPet() {
                             pausarTerminal();
                             break;
                             case 2:
-                                switch (excluirPet(id)){
-                                    case 0:
-                                        printf("\nSucesso ao excluir pet com [ID] -> [%d]\n",id);
-                                        pausarTerminal();
-                                        break;
-                                    case 1:
-                                        perror("\nErro ao abrir o arquivo original da base de dados");
-                                        pausarTerminal();
-                                        break;
-                                    case 2:
-                                        perror("\nErro ao criar o arquivo temporário da base de dados");
-                                        pausarTerminal();
-                                        break;
-                                    case 3:
-                                        printf("\nNão foi encontrado um pet com [ID] -> [%d]\n",id);
-                                        pausarTerminal();
-                                        break;
-                                    default:
-                                        perror("\nErro ao tentar excluir o pet");
-                                        pausarTerminal();
-                                        break;
+                                prestadosVinculados = listarPrestadosPorPet(pet->id);
+                                int qtdPrestadosVinculados = 0;
+                                //aqui vamos encontrar o pet vinculado
+                                if(prestadosVinculados){
+                                    float lucroTotal;
+                                    Cliente *cliente;
+                                    Servico *servico;
+                                    // Percorre o array até encontrar o marcador de término (id == -1)
+                                    while (prestadosVinculados[qtdPrestadosVinculados].id != -1) {
+                                        qtdPrestadosVinculados++;
+                                    }
+                                    printf("\n=== Existem Serviços Prestados vinculados ao Pet: %s (%d no total)===\n\n", pet->nome, qtdPrestadosVinculados);
+                                    for (int i = 0; i < qtdPrestadosVinculados; i++) {
+                                        //alterar print
+                                        lucroTotal = lucroTotal + prestadosVinculados[i].lucro;
+                                        printf("ID: %d, Data: %s \nID do Serviço: %d, ",
+                                        prestadosVinculados[i].id, prestadosVinculados[i].data, prestadosVinculados[i].codServico);
+                                        servico = buscarServicoPeloID(prestadosVinculados[i].codServico);
+                                        if(servico){
+                                            printf("Nome: %s, Valor Cobrado: [R$ %.2f] | Custo: [R$ %.2f] | Lucro: [R$ %.2f]\n",
+                                            servico->nome, servico->valorCobrado, servico->valorCusto, prestadosVinculados[i].lucro);
+                                        }else{
+                                            printf("[SERVIÇO NÃO ENCONTRADO] | Lucro: [R$ %.2f]\n", prestadosVinculados[i].lucro);
+                                        }
+                                        printf("ID do Pet: %d, ", prestadosVinculados[i].codPet);
+                                        printf("Nome: %s, Espécie: %s \nID do Cliente Responsável: %d, ",
+                                        pet->nome, pet->especie, pet->codCliente);
+                                        cliente = buscarClientePeloID(pet->codCliente);
+                                        if(cliente){
+                                            printf("Nome: %s, Telefone: %s, CPF: %s\n\n",
+                                            cliente->nome, cliente->telefone, cliente->cpf);
+                                        }else{
+                                            printf("[CLIENTE NÃO ENCONTRADO]\n\n");
+                                        }   
+                                    }
+                                    free(cliente);
+                                    free(servico);
+                                    printf("\n=== Lucro Total dos Serviços Prestados para %s R$ %.2f ===\n\n",pet->nome, lucroTotal);
+                                    lucroTotal = 0;
+                                    printf("\nPara Excluir %s será necessário excluir seus Serviços Prestados primeiro!\n", pet->nome);
+                                    pausarTerminal();
+                                }else{
+                                    switch (excluirPet(id)){
+                                        case 0:
+                                            printf("\nSucesso ao excluir pet com [ID] -> [%d]\n",id);
+                                            pausarTerminal();
+                                            break;
+                                        case 1:
+                                            perror("\nErro ao abrir o arquivo original da base de dados");
+                                            pausarTerminal();
+                                            break;
+                                        case 2:
+                                            perror("\nErro ao criar o arquivo temporário da base de dados");
+                                            pausarTerminal();
+                                            break;
+                                        case 3:
+                                            printf("\nNão foi encontrado um pet com [ID] -> [%d]\n",id);
+                                            pausarTerminal();
+                                            break;
+                                        default:
+                                            perror("\nErro ao tentar excluir o pet");
+                                            pausarTerminal();
+                                            break;
+                                    }
                                 }
+                                free(prestadosVinculados);
+                                
                             break;
                             default:
                             printf("\nOpção inválida!");
