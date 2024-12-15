@@ -166,3 +166,52 @@ Pet *buscarPetPeloID(int id) {
     fclose(file);
     return NULL; // Pet não encontrado
 }
+
+Pet *listarPetsPorCliente(int idCliente) { //falta implementar na main
+    FILE *file = fopen(ARQUIVO_PET, "rb");
+    if (file == NULL) {
+        return NULL; // Arquivo inexistente
+    }
+
+    Pet pet;
+    int total = 0;
+
+    // Contar quantos pets estão vinculados ao idCliente
+    while (fread(&pet, sizeof(Pet), 1, file)) {
+        if (pet.codCliente == idCliente) {
+            total++;
+        }
+    }
+
+    // Se não há pets vinculados, encerra
+    if (total == 0) {
+        fclose(file);
+        return NULL;
+    }
+
+    // Aloca memória para armazenar os pets vinculados
+    Pet *pets = (Pet *)malloc((total + 1) * sizeof(Pet)); //adiciona 1 pet a mais para definir o final do array
+    if (pets == NULL) {
+        fclose(file);
+        return NULL; // Falha na alocação de memória
+    }
+
+    rewind(file); // Volta ao início do arquivo para ler novamente
+    int index = 0;
+
+    // Lê os pets vinculados ao idCliente
+    while (fread(&pet, sizeof(Pet), 1, file)) {
+        if (pet.codCliente == idCliente) {
+            pets[index++] = pet;
+        }
+    }
+
+    // Configura o marcador de término
+    pets[index].id = -1;
+    pets[index].nome[0] = '\0';
+    pets[index].especie[0] = '\0';
+
+    fclose(file);
+
+    return pets; // Retorna a lista de pets encontrados
+}

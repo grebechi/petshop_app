@@ -21,5 +21,6 @@ Pet *listarPets(int quantidade);
 int atualizarPet(Pet *petRecebido);
 int excluirPet(int id);
 Pet *buscarPetPeloID(int id);
+Pet *listarPetsPorCliente(int idCliente);
 
 #endif
