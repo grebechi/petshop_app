@@ -41,15 +41,18 @@ int contarServicos() {
         return 0; // Arquivo inexistente ou vazio
     }
 
-    Servico servico;
-    int count = 0;
+    // Move o ponteiro para o final do arquivo
+    fseek(file, 0, SEEK_END);
 
-    while (fread(&servico, sizeof(Servico), 1, file)) {
-        count++;
-    }
+    // Calcula o tamanho do arquivo em bytes
+    long tamanhoArquivo = ftell(file);
+
+    // Calcula o número de registros dividindo o tamanho total pelo tamanho de um struct de Servico
+    int totalServico = tamanhoArquivo / sizeof(Servico);
 
     fclose(file);
-    return count;
+
+    return totalServico;
 }
 
 Servico *listarServicos(int quantidade) {

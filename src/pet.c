@@ -41,15 +41,18 @@ int contarPets() {
         return 0; // Arquivo inexistente ou vazio
     }
 
-    Pet pet;
-    int count = 0;
+    // Move o ponteiro para o final do arquivo
+    fseek(file, 0, SEEK_END);
 
-    while (fread(&pet, sizeof(Pet), 1, file)) {
-        count++;
-    }
+    // Calcula o tamanho do arquivo em bytes
+    long tamanhoArquivo = ftell(file);
+
+    // Calcula o número de registros dividindo o tamanho total pelo tamanho de um struct de Pet
+    int totalPets = tamanhoArquivo / sizeof(Pet);
 
     fclose(file);
-    return count;
+
+    return totalPets;
 }
 
 Pet *listarPets(int quantidade) {
@@ -175,14 +178,13 @@ Pet *listarPetsPorCliente(int idCliente) {
 
     Pet pet;
     int total = 0;
-
+    
     // Contar quantos pets estão vinculados ao idCliente
     while (fread(&pet, sizeof(Pet), 1, file)) {
         if (pet.codCliente == idCliente) {
             total++;
         }
     }
-
     // Se não há pets vinculados, encerra
     if (total == 0) {
         fclose(file);

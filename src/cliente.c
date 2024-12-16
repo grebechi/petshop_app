@@ -41,15 +41,18 @@ int contarClientes() {
         return 0; // Arquivo inexistente ou vazio
     }
 
-    Cliente cliente;
-    int count = 0;
+    // Move o ponteiro para o final do arquivo
+    fseek(file, 0, SEEK_END);
 
-    while (fread(&cliente, sizeof(Cliente), 1, file)) {
-        count++;
-    }
+    // Calcula o tamanho do arquivo em bytes
+    long tamanhoArquivo = ftell(file);
+
+    // Calcula o número de registros dividindo o tamanho total pelo tamanho de um struct de Cliente
+    int totalClientes = tamanhoArquivo / sizeof(Cliente);
 
     fclose(file);
-    return count;
+
+    return totalClientes;
 }
 
 Cliente *listarClientes(int quantidade) {
