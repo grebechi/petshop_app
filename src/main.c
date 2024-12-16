@@ -554,6 +554,7 @@ void menuPet() {
                 scanf("%d", &id);
                 Pet *pet = buscarPetPeloID(id);
                 Prestado *prestadosVinculados;
+                int qtdPrestadosVinculados;
                 if(pet){
                     int subOpcao;
                     printf("\n=== Pet Localizado pelo [ID] -> [%d] ===",id);
@@ -569,17 +570,12 @@ void menuPet() {
                             pausarTerminal();
                             break;
                             case 2:
-                                prestadosVinculados = listarPrestadosPorPet(pet->id);
-                                int qtdPrestadosVinculados = 0;
+                                prestadosVinculados = listarPrestadosPorPet(pet->id, &qtdPrestadosVinculados);
                                 //aqui vamos encontrar o pet vinculado
                                 if(prestadosVinculados){
                                     float lucroTotal;
                                     Cliente *cliente;
                                     Servico *servico;
-                                    // Percorre o array até encontrar o marcador de término (id == -1)
-                                    while (prestadosVinculados[qtdPrestadosVinculados].id != -1) {
-                                        qtdPrestadosVinculados++;
-                                    }
                                     printf("\n=== Existem Serviços Prestados vinculados ao Pet: %s (%d no total)===\n\n", pet->nome, qtdPrestadosVinculados);
                                     for (int i = 0; i < qtdPrestadosVinculados; i++) {
                                         //alterar print
