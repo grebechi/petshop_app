@@ -220,6 +220,7 @@ void menuCliente() {
                 scanf("%d", &id);
                 Cliente *cliente = buscarClientePeloID(id);
                 Pet *petsVinculados;
+                int qtdPetsVinculados;
                 if(cliente){
                     int subOpcao;
                     printf("\n=== Cliente Localizado pelo [ID] -> [%d] ===",id);
@@ -235,15 +236,10 @@ void menuCliente() {
                             pausarTerminal();
                             break;
                             case 2:
-
-                                petsVinculados = listarPetsPorCliente(cliente->id);
-                                int qtdPetsVinculados = 0;
+                                petsVinculados = listarPetsPorCliente(cliente->id, &qtdPetsVinculados);
+                                
                                 //aqui vamos encontrar o pet vinculado
                                 if(petsVinculados){
-                                    // Percorre o array até encontrar o marcador de término (id == -1)
-                                    while (petsVinculados[qtdPetsVinculados].id != -1) {
-                                        qtdPetsVinculados++;
-                                    }
                                     printf("\n=== Existem pets vinculados ao cliente: %s (%d no total)===\n", cliente->nome, qtdPetsVinculados);
                                     for (int i = 0; i < qtdPetsVinculados; i++) {
                                         printf("ID: %d, Nome: %s, Espécie: %s\n",
@@ -451,7 +447,7 @@ void menuPet() {
                     }
                 break;
             }
-            case 3:{ //Atualizar Pet da pra melhorar, listando o cliente atual 
+            case 3:{ //Atualizar Pet 
                 int id, codCliente, confirmaCliente, repeteCliente;
                 limparTerminal();
                 printf("\n=== Atualizar Pet ===\n\n");
@@ -546,7 +542,7 @@ void menuPet() {
                 free(petParaEnviar);
                 break;
             }
-            case 4:{ //Excluir Pet da pra melhorar listando o cliente quando o pet for encontrado
+            case 4:{ //Excluir Pet
                 int id;
                 limparTerminal();
                 printf("\n=== Excluir Pet ===\n\n");
